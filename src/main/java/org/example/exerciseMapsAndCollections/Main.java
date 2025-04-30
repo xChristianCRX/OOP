@@ -1,5 +1,8 @@
 package org.example.exerciseMapsAndCollections;
 
+import org.example.exerciseMapsAndCollections.entities.employee.Employee;
+import org.example.exerciseMapsAndCollections.entities.paycheck.Paycheck;
+
 import java.time.LocalDate;
 import java.util.Iterator;
 
