@@ -14,7 +14,10 @@ public class FakeDbEmployee implements EmployeeRepository {
 
     @Override
     public String create(Employee employee) {
-        if (db.containsKey(employee.getId())) throw
+        idCounter++;
+        employee.setId(String.valueOf(idCounter));
+        db.put(employee, employee.getId());
+        return employee.getId();
     }
 
     @Override
