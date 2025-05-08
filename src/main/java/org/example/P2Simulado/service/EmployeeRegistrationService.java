@@ -7,35 +7,30 @@ import org.example.P2Simulado.model.Reseller;
 import org.example.P2Simulado.persistence.Repository;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 public class EmployeeRegistrationService {
-    private Repository repository;
+    private final Repository<String, Employee> repository;
 
-    public EmployeeRegistrationService(Repository repository) {
+    public EmployeeRegistrationService(Repository<String, Employee> repository) {
         this.repository = repository;
     }
 
-    public String register(String id, String name, LocalDate birthDate, double soldValue, String consultantId){
-        if(repository.findById(id).isPresent())
-            throw new EntityAlreadyExistsException("Employee already exists");
+    public void register(String id, String name, LocalDate birthDate, double soldValue, String consultantId) {
+        Employee consultantOpt = repository.findById(consultantId).orElse(null);
 
-        Optional<Employee> consultantOpt = repository.findById(consultantId);
-        if(consultantOpt.isEmpty())
-            throw new IllegalArgumentException("Consultant not found");
-
-        Employee consultant = consultantOpt.get();
-        if(consultant instanceof Reseller){
-            Employee newConsultant = new Consultant(
-                    consultant.getId(),
-                    consultant.getName(),
-                    consultant.getBirthDate(),
-                    consultant.getSoldValue(),
-                    consultant.getConsultantInCharge()
-            );
-            repository.update(newConsultant);
+        if(consultantOpt == null){
+            repository.save(new Reseller(id, name, birthDate, soldValue, null));
+            return;
         }
 
-        Employee reseller = new Reseller(id, name, birthDate, soldValue, consultant);
+        Consultant consultant = consultantOpt instanceof Reseller
+                ? ((Reseller) consultantOpt).promote()
+                : (Consultant) consultantOpt;
+
+        final Reseller newEmployee = new Reseller(id, name, birthDate, soldValue, consultant);
+        consultant.addEmployee(newEmployee);
+
+        repository.update(consultant);
+        repository.save(newEmployee);
     }
 }

@@ -8,7 +8,17 @@ public final class Reseller extends Employee {
     }
 
     @Override
-    public double getComission() {
+    public double getCommission() {
         return getSoldValue() * 0.15;
+    }
+
+    public Consultant promote(){
+        return new Consultant(
+                id,
+                name,
+                birthDate,
+                soldValue,
+                consultantInCharge
+        );
     }
 }
